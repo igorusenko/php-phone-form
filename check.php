@@ -1,34 +1,51 @@
 <?php
+error_reporting(0);
+ini_set('display_errors', 0);
+
 header('Content-Type: application/json; charset=utf-8');
 
-if (!isset($_POST['phone'])) {
+$phone = isset($_POST['phone']) ? trim($_POST['phone']) : null;
+
+if (!$phone) {
     echo json_encode(['success' => false, 'error' => 'Нет данных']);
     exit;
 }
 
-$phone = trim($_POST['phone']);
-
-if (!preg_match('/^\+\d{11,18}$/', $phone)) {
-    echo json_encode(['success' => false, 'error' => 'Неверный формат номера']);
-    exit;
-}
-
 $prefixes = [
-    '+373' => 'Молдова',
-    '+7'   => 'Россия/Казахстан',
-    '+380' => 'Украина',
-    '+1'   => 'США/Канада',
-    '+44'  => 'Великобритания',
-    '+49'  => 'Германия',
-    '+40'  => 'Румыния'
+    '+373' => ['country' => 'Молдова / Приднестровье', 'length' => 12],
+    '+7'   => ['country' => 'Россия / Казахстан', 'length' => 11],
+    '+380' => ['country' => 'Украина', 'length' => 12],
+    '+1'   => ['country' => 'США/Канада', 'length' => 12],
+    '+44'  => ['country' => 'Великобритания', 'length' => 13],
+    '+49'  => ['country' => 'Германия', 'length' => 13],
+    '+40'  => ['country' => 'Румыния', 'length' => 12]
 ];
 
 $country = 'Неизвестная страна';
-foreach ($prefixes as $code => $name) {
+$validLength = null;
+
+foreach ($prefixes as $code => $info) {
     if (strpos($phone, $code) === 0) {
-        $country = $name;
+        $country = $info['country'];
+        $validLength = $info['length'];
         break;
     }
+}
+
+if ($country === 'Неизвестная страна') {
+    echo json_encode(['success' => false, 'error' => 'Неизвестный код страны']);
+    exit;
+}
+
+
+if (strlen($phone) !== $validLength) {
+    echo json_encode(['success' => false, 'error' => "Неверное количество цифр для $country"]);
+    exit;
+}
+
+if (!preg_match('/^\+\d+$/', $phone)) {
+    echo json_encode(['success' => false, 'error' => 'Номер содержит недопустимые символы']);
+    exit;
 }
 
 echo json_encode(['success' => true, 'country' => $country]);
