@@ -9,7 +9,7 @@ if (!isset($_POST['phone'])) {
 $phone = trim($_POST['phone']);
 
 // Простая проверка — номер должен начинаться с "+" и содержать 8–15 цифр
-if (!preg_match('/^\+\d{8,15}$/', $phone)) {
+if (!preg_match('/^\+\d{11,18}$/', $phone)) {
     echo json_encode(['success' => false, 'error' => 'Неверный формат номера']);
     exit;
 }
