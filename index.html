@@ -26,6 +26,20 @@
         #result { margin-top: 15px; font-weight: bold; }
         .error { color: red; }
         .success { color: green; }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -37,27 +51,47 @@
         <button type="submit">Проверить</button>
     </form>
 
+    <div id="loading" class="spinner" style="display: none;"></div>
+
     <div id="result"></div>
 </div>
 <h4>Код поддерживает '+373' '+7' '+380' '+1' '+44' '+49' '+40' </h4>
 <script>
-    document.getElementById('phoneForm').addEventListener('submit', async function(e) {
+    const form = document.getElementById('phoneForm');
+    const loading = document.getElementById('loading');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const phone = document.getElementById('phone').value;
 
-        const response = await fetch('check.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'phone=' + encodeURIComponent(phone)
-        });
+        loading.style.display = 'block';
+        result.textContent = '';
 
-        const data = await response.json();
-        const result = document.getElementById('result');
+        const formData = new FormData(form);
 
-        if (data.success) {
-            result.innerHTML = `<span class="success">✅ Номер принадлежит стране: ${data.country}</span>`;
-        } else {
-            result.innerHTML = `<span class="error">❌ Ошибка: ${data.error}</span>`;
+        try {
+            const response = await fetch('check.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            let data;
+            try {
+                data = await response.json();
+            } catch (err) {
+                data = { success: false, error: 'Сервер вернул невалидный JSON' };
+            }
+
+            if (data.success) {
+                result.innerHTML = `<span class="success">✅ Номер принадлежит стране: ${data.country}</span>`;
+            } else {
+                result.innerHTML = `<span class="error">❌ Ошибка: ${data.error}</span>`;
+            }
+
+        } catch (err) {
+            result.textContent = 'Ошибка сети или сервера';
+        } finally {
+            loading.style.display = 'none';
         }
     });
 </script>
