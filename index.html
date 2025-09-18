@@ -4,23 +4,42 @@
     <meta charset="UTF-8">
     <title>Проверка телефона</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 30px; }
-        input, button { padding: 8px; margin-top: 10px; }
+        body { font-family: Arial, sans-serif; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center }
+        .form-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: lightgreen;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid forestgreen;
+            min-width: 500px;
+        }
+        input, button { padding: 8px; margin-top: 10px; border-radius: 1rem; outline: none; border: 1px solid forestgreen }
+        button {
+            cursor: pointer;
+
+            &:hover {
+                background-color: greenyellow;
+            }
+        }
         #result { margin-top: 15px; font-weight: bold; }
         .error { color: red; }
         .success { color: green; }
     </style>
 </head>
 <body>
+<div class="form-content">
+    <h2>HI-TECH</h2>
+    <h3>Введите номер телефона</h3>
+    <form id="phoneForm">
+        <input type="text" name="phone" id="phone" placeholder="+37312345678" required>
+        <button type="submit">Проверить</button>
+    </form>
 
-<h2>Введите номер телефона</h2>
-<form id="phoneForm">
-    <input type="text" name="phone" id="phone" placeholder="+37312345678" required>
-    <button type="submit">Проверить</button>
-</form>
-
-<div id="result"></div>
-
+    <div id="result"></div>
+</div>
+<h4>Код поддерживает '+373' '+7' '+380' '+1' '+44' '+49' '+40' </h4>
 <script>
     document.getElementById('phoneForm').addEventListener('submit', async function(e) {
         e.preventDefault();
