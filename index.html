@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Проверка телефона</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 30px; }
+        input, button { padding: 8px; margin-top: 10px; }
+        #result { margin-top: 15px; font-weight: bold; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+
+<h2>Введите номер телефона</h2>
+<form id="phoneForm">
+    <input type="text" name="phone" id="phone" placeholder="+37312345678" required>
+    <button type="submit">Проверить</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    document.getElementById('phoneForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const phone = document.getElementById('phone').value;
+
+        const response = await fetch('check.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'phone=' + encodeURIComponent(phone)
+        });
+
+        const data = await response.json();
+        const result = document.getElementById('result');
+
+        if (data.success) {
+            result.innerHTML = `<span class="success">✅ Номер принадлежит стране: ${data.country}</span>`;
+        } else {
+            result.innerHTML = `<span class="error">❌ Ошибка: ${data.error}</span>`;
+        }
+    });
+</script>
+
+</body>
+</html>
